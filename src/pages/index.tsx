@@ -1,7 +1,6 @@
 import Head from "next/head";
-import Link from "next/link";
 import Image from "next/image";
-import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
+import { useUser, SignInButton } from "@clerk/nextjs";
 
 import { api } from "~/utils/api";
 
@@ -28,9 +27,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col">
-            {[...data, ...data].map((post) => (
-              <div key={post.id} className="border-b border-slate-400 p-8">
-                {post.content}
+            {[...data, ...data].map(({ post, author }) => (
+              <div key={post.id} className="flex flex-col w-full border-b border-slate-400 p-8">
+                <div className="font-semibold">{author?.username}</div>
+                <div>{post.content}</div>
               </div>
             ))}
           </div>
@@ -46,7 +46,7 @@ const CreatePostWizard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex gap-3 w-full">
+    <div className="flex w-full gap-3">
       <Image
         src={user.imageUrl}
         alt="Profile image"
@@ -54,7 +54,10 @@ const CreatePostWizard = () => {
         width={48}
         height={48}
       />
-      <input placeholder="Type some emojis..." className="bg-transparent grow outline-none" />
+      <input
+        placeholder="Type some emojis..."
+        className="grow bg-transparent outline-none"
+      />
     </div>
   );
 };
