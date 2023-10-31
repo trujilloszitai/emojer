@@ -2,7 +2,12 @@ import Head from "next/head";
 import Image from "next/image";
 import { useUser, SignInButton } from "@clerk/nextjs";
 
-import { api } from "~/utils/api";
+import dayjs from 'dayjs';
+import relativeTime from "dayjs/plugin/relativeTime";
+
+import { RouterOutputs, api } from "~/utils/api";
+
+dayjs.extend(relativeTime);
 
 export default function Home() {
   const user = useUser();
@@ -20,18 +25,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen justify-center">
-        <div className="w-full border-x border-slate-400 md:max-w-2xl">
-          <div className="border-b border-slate-400 p-4 ">
+        <div className="w-full border-x border-slate-700 md:max-w-2xl">
+          <div className="border-b border-slate-700 p-4 ">
             <div className="flex justify-center">
               {user.isSignedIn ? <CreatePostWizard /> : <SignInButton />}
             </div>
           </div>
           <div className="flex flex-col">
-            {[...data, ...data].map(({ post, author }) => (
-              <div key={post.id} className="flex flex-col w-full border-b border-slate-400 p-8">
-                <div className="font-semibold">{author?.username}</div>
-                <div>{post.content}</div>
-              </div>
+            {[...data, ...data].map((fullPost) => (
+              <PostView key={fullPost.post.id} {...fullPost} />
             ))}
           </div>
         </div>
@@ -58,6 +60,33 @@ const CreatePostWizard = () => {
         placeholder="Type some emojis..."
         className="grow bg-transparent outline-none"
       />
+    </div>
+  );
+};
+
+type PostWithUser = RouterOutputs["post"]["getAll"][number];
+const PostView = (props: PostWithUser) => {
+  const { post, author } = props;
+
+  return (
+    <div
+      key={post.id}
+      className="flex w-full items-start border-b border-slate-700 p-8 gap-x-3"
+    >
+      <Image
+        src={author.imageUrl}
+        alt={`${author.username}}'s profile image`}
+        width={36}
+        height={36}
+        className="h-10 w-10 rounded-full"
+      />
+      <div className="flex flex-col w-full">
+        <div className="flex w-full justify-between items-center">
+        <span className="font-medium text-slate-400 hover:text-slate-200">{`@${author.username}`}</span>
+        <span className="text-slate-500 text-sm">{dayjs(post.createdAt).fromNow()}</span>
+        </div>
+        <span>{post.content}</span>
+      </div>
     </div>
   );
 };
