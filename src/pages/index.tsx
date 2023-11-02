@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useUser, SignInButton } from "@clerk/nextjs";
@@ -78,7 +79,7 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {[...data, ...data].map((fullPost) => (
+      {data.map((fullPost) => (
         <PostView key={fullPost.post.id} {...fullPost} />
       ))}
     </div>
@@ -87,6 +88,10 @@ const Feed = () => {
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+
+  const [input, setInput] = useState("");
+
+  const { mutate } = api.post.create.useMutation();
 
   if (!user) return null;
 
@@ -102,7 +107,10 @@ const CreatePostWizard = () => {
       <input
         placeholder="Type some emojis..."
         className="grow bg-transparent outline-none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
+      <button onClick={() => mutate({content: input})}>Post</button>
     </div>
   );
 };
