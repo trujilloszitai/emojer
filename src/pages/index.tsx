@@ -88,10 +88,15 @@ const Feed = () => {
 
 const CreatePostWizard = () => {
   const { user } = useUser();
-
   const [input, setInput] = useState("");
+  const ctx = api.useUtils();
 
-  const { mutate } = api.post.create.useMutation();
+  const { mutate, isLoading: isPosting } = api.post.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.post.getAll.invalidate();
+    },
+  });
 
   if (!user) return null;
 
@@ -109,6 +114,7 @@ const CreatePostWizard = () => {
         className="grow bg-transparent outline-none"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
       />
       <button onClick={() => mutate({content: input})}>Post</button>
     </div>
