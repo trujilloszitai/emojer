@@ -1,11 +1,12 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useUser, SignInButton } from "@clerk/nextjs";
+import { Spinner } from "~/components";
 
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 
 dayjs.extend(relativeTime);
 
@@ -13,7 +14,7 @@ export default function Home() {
   const user = useUser();
   const { data, isLoading } = api.post.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Spinner size={64} />;
 
   if (!data) return <div>Something went wrong</div>;
 
