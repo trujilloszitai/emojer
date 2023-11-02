@@ -56,14 +56,14 @@ const PostView = (props: PostWithUser) => {
         height={36}
         className="h-10 w-10 rounded-full"
       />
-      <div className="flex w-full flex-col">
+      <div className="flex w-full flex-col gap-y-2">
         <div className="flex w-full items-center justify-between">
           <span className="font-medium text-slate-400 hover:text-slate-200">{`@${author.username}`}</span>
           <span className="text-sm text-slate-500">
             {dayjs(post.createdAt).fromNow()}
           </span>
         </div>
-        <span>{post.content}</span>
+        <span className="text-xl">{post.content}</span>
       </div>
     </div>
   );
