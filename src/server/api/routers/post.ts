@@ -58,7 +58,7 @@ export const postRouter = createTRPCRouter({
   create: privateProcedure
     .input(
       z.object({
-        content: z.string().emoji().min(1).max(256),
+        content: z.string().emoji("Make sure you're typing emojis!").min(1).max(256),
       }),
     )
     .mutation(async ({ ctx, input }) => {

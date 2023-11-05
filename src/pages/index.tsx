@@ -2,6 +2,7 @@ import { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
+import toast from "react-hot-toast";
 import { Spinner } from "~/components";
 
 import dayjs from "dayjs";
@@ -96,6 +97,13 @@ const CreatePostWizard = () => {
       setInput("");
       void ctx.post.getAll.invalidate();
     },
+    onError: (err) => {
+      const errorMessage = err.data?.zodError?.fieldErrors.content;
+      if(errorMessage?.[0]) toast.error(errorMessage[0]);
+      else toast.error("Something went wrong. Try again later.");
+      /* if(!errorMessage?.[0]) toast.error("Something went wrong. Try again later.")
+      else toast.error(errorMessage[0]); */
+    }
   });
 
   if (!user) return null;
