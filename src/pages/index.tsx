@@ -13,7 +13,7 @@ import { type RouterOutputs, api } from "~/utils/api";
 dayjs.extend(relativeTime);
 
 export default function Home() {
-  const { isLoaded: userLoaded, isSignedIn  } = useUser();
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
 
   // Start fetching asap
   api.post.getAll.useQuery();
@@ -35,7 +35,7 @@ export default function Home() {
               {isSignedIn ? <CreatePostWizard /> : <SignInButton />}
             </div>
           </div>
-            <Feed />
+          <Feed />
         </div>
       </main>
     </>
@@ -74,7 +74,7 @@ const PostView = (props: PostWithUser) => {
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.post.getAll.useQuery();
 
-  if(postsLoading) return <Spinner size={64} />;
+  if (postsLoading) return <LoadingScreen />;
 
   if (!data) return <div>Something went wrong</div>;
 
@@ -90,7 +90,7 @@ const Feed = () => {
 const CreatePostWizard = () => {
   const { user } = useUser();
   const [input, setInput] = useState("");
-  const ctx = api.useUtils();
+  const ctx = api.useUtils(); // Calling our API
 
   const { mutate, isLoading: isPosting } = api.post.create.useMutation({
     onSuccess: () => {
@@ -99,11 +99,9 @@ const CreatePostWizard = () => {
     },
     onError: (err) => {
       const errorMessage = err.data?.zodError?.fieldErrors.content;
-      if(errorMessage?.[0]) toast.error(errorMessage[0]);
+      if (errorMessage?.[0]) toast.error(errorMessage[0]);
       else toast.error("Something went wrong. Try again later.");
-      /* if(!errorMessage?.[0]) toast.error("Something went wrong. Try again later.")
-      else toast.error(errorMessage[0]); */
-    }
+    },
   });
 
   if (!user) return null;
@@ -124,8 +122,33 @@ const CreatePostWizard = () => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         disabled={isPosting}
+        onKeyDown={(e)=>{
+          if(e.key === "Enter") {
+            e.preventDefault();
+            if(input !== "") {
+              mutate({ content: input });
+            }
+          }
+        }}
       />
-      <button onClick={() => mutate({content: input})}>Post</button>
+      {(input !== "" && !isPosting) && (
+        <button onClick={() => mutate({ content: input })} disabled={isPosting}>
+        Post
+      </button>)}
+
+      {isPosting && (
+        <div className="flex justify-center items-center">
+          <Spinner size={18} />
+        </div>
+      )}
     </div>
   );
 };
+
+const LoadingScreen = () => {
+  return (
+    <div className="flex h-screen justify-center items-center">
+      <Spinner size={64} />
+    </div>
+  );
+}
