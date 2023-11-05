@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
-import { useUser, SignInButton } from "@clerk/nextjs";
+import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import { Spinner } from "~/components";
 
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ import { type RouterOutputs, api } from "~/utils/api";
 dayjs.extend(relativeTime);
 
 export default function Home() {
-  const { user, isLoaded: userLoaded, isSignedIn  } = useUser();
+  const { isLoaded: userLoaded, isSignedIn  } = useUser();
 
   // Start fetching asap
   api.post.getAll.useQuery();
@@ -102,13 +102,14 @@ const CreatePostWizard = () => {
 
   return (
     <div className="flex w-full gap-3">
-      <Image
+      {/* <Image
         src={user.imageUrl}
         alt="Profile image"
         className="h-10 w-10 rounded-full"
         width={48}
         height={48}
-      />
+      /> */}
+      <UserButton />
       <input
         placeholder="Type some emojis..."
         className="grow bg-transparent outline-none"
