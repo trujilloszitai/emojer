@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { Spinner } from "~/components";
@@ -47,27 +48,31 @@ const PostView = (props: PostWithUser) => {
   const { post, author } = props;
 
   return (
-    <div
-      key={post.id}
-      className="flex w-full items-start gap-x-3 border-b border-slate-700 p-8"
-    >
-      <Image
-        src={author.imageUrl}
-        alt={`${author.username}}'s profile image`}
-        width={36}
-        height={36}
-        className="h-10 w-10 rounded-full"
-      />
-      <div className="flex w-full flex-col gap-y-2">
-        <div className="flex w-full items-center justify-between">
-          <span className="font-medium text-slate-400 hover:text-slate-200">{`@${author.username}`}</span>
-          <span className="text-sm text-slate-500">
-            {dayjs(post.createdAt).fromNow()}
-          </span>
+    <Link href={`/post/${post.id}`}>
+      <div
+        key={post.id}
+        className="flex w-full items-start gap-x-3 border-b border-slate-700 p-8"
+      >
+        <Image
+          src={author.imageUrl}
+          alt={`${author.username}}'s profile image`}
+          width={36}
+          height={36}
+          className="h-10 w-10 rounded-full"
+        />
+        <div className="flex w-full flex-col gap-y-2">
+          <div className="flex w-full items-center justify-between">
+            <Link href={`/@${author.username}`}>
+              <span className="font-medium text-slate-400 hover:text-slate-200">{`@${author.username}`}</span>
+            </Link>
+            <span className="text-sm text-slate-500">
+              {dayjs(post.createdAt).fromNow()}
+            </span>
+          </div>
+          <span className="text-xl">{post.content}</span>
         </div>
-        <span className="text-xl">{post.content}</span>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -122,22 +127,23 @@ const CreatePostWizard = () => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         disabled={isPosting}
-        onKeyDown={(e)=>{
-          if(e.key === "Enter") {
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
             e.preventDefault();
-            if(input !== "") {
+            if (input !== "") {
               mutate({ content: input });
             }
           }
         }}
       />
-      {(input !== "" && !isPosting) && (
+      {input !== "" && !isPosting && (
         <button onClick={() => mutate({ content: input })} disabled={isPosting}>
-        Post
-      </button>)}
+          Post
+        </button>
+      )}
 
       {isPosting && (
-        <div className="flex justify-center items-center">
+        <div className="flex items-center justify-center">
           <Spinner size={18} />
         </div>
       )}
@@ -147,8 +153,8 @@ const CreatePostWizard = () => {
 
 const LoadingScreen = () => {
   return (
-    <div className="flex h-screen justify-center items-center">
+    <div className="flex h-screen items-center justify-center">
       <Spinner size={64} />
     </div>
   );
-}
+};
