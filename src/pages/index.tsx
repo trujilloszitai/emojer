@@ -1,10 +1,9 @@
 import { useState } from "react";
-import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-import { Spinner } from "~/components";
+import { Spinner, LoadingScreen } from "~/components";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -142,14 +141,6 @@ const CreatePostWizard = () => {
           <Spinner size={18} />
         </div>
       )}
-    </div>
-  );
-};
-
-const LoadingScreen = () => {
-  return (
-    <div className="flex h-screen items-center justify-center">
-      <Spinner size={64} />
     </div>
   );
 };
