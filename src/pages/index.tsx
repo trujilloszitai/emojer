@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import { type RouterOutputs, api } from "~/utils/api";
+import { AppLayout } from "~/components/Layout";
 
 dayjs.extend(relativeTime);
 
@@ -23,16 +24,14 @@ export default function Home() {
 
   return (
     <>
-      <main className="flex min-h-screen justify-center">
-        <div className="w-full border-x border-slate-700 md:max-w-2xl">
+      <AppLayout>
           <div className="border-b border-slate-700 p-4 ">
             <div className="flex justify-center">
               {isSignedIn ? <CreatePostWizard /> : <SignInButton />}
             </div>
           </div>
           <Feed />
-        </div>
-      </main>
+      </AppLayout>
     </>
   );
 }
