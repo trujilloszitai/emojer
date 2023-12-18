@@ -7,6 +7,7 @@ import { appRouter } from "~/server/api/root";
 import superjson from "superjson";
 import type { NextPage, GetStaticProps, GetStaticPaths } from "next";
 import { AppLayout } from "~/components/Layout";
+import { LoadingScreen, PostView } from "~/components";
 
 const Profile: NextPage<{ username: string }> = ({ username }) => {
   const { data } = api.profile.getUserByUsername.useQuery({
@@ -32,10 +33,12 @@ const Profile: NextPage<{ username: string }> = ({ username }) => {
             />
           </div>
           <div className="h-[64px]"></div>
-          <div className="p-4 text-2xl font-bold">
+          <div className="p-4 text-2xl font-bold border-b border-slate-700">
             {`@${data.username}`}
           </div>
-          <div className="border-b border-slate-700"></div>
+          <div className="border-b border-slate-700">
+            <ProfileFeed userId={data.id} />
+          </div>
         </div>
       </AppLayout>
     </>
@@ -70,3 +73,17 @@ export const getStaticProps: GetStaticProps = async (context) => {
     },
   };
 };
+
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.post.getByUserId.useQuery({ userId: props.userId })
+
+  if (isLoading) return <LoadingScreen />;
+
+  if (!data || data.length === 0) return <div>User has not posted!</div>;
+
+  return <div className="flex flex-col">
+    {data.map((fullPost) => (
+      <PostView {...fullPost} key={fullPost.post.id} />
+    ))}
+  </div>
+}
