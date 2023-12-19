@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: fake.com
+      DATABASE_URL: "https://fake.com"
 
     steps:
     - name: Checkout repository
