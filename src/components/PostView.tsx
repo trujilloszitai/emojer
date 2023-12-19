@@ -12,9 +12,9 @@ const PostView = (props: PostWithUser) => {
   const { post, author } = props;
 
   return (
-    <Link href={`/post/${post.id}`}>
-      <div
-        key={post.id}
+    <div key={post.id}>
+      <Link
+        href={`/post/${post.id}`}
         className="flex w-full items-start gap-x-3 border-b border-slate-700 p-8"
       >
         <Image
@@ -30,13 +30,13 @@ const PostView = (props: PostWithUser) => {
               <span className="font-medium text-slate-400 hover:text-slate-200">{`@${author.username}`}</span>
             </Link>
             <span className="text-sm text-slate-500">
-            • {dayjs(post.createdAt).fromNow()}
+              • {dayjs(post.createdAt).fromNow()}
             </span>
           </div>
           <span className="text-xl">{post.content}</span>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };
 
