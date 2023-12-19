@@ -11,6 +11,7 @@ import {
   privateProcedure,
 } from "~/server/api/trpc";
 import { clientUserFilter } from "~/server/helpers/clientUserFilter";
+import { parse } from "path";
 
 // Allow up to 5 requests per minute
 const ratelimit = new Ratelimit({
@@ -56,6 +57,18 @@ export const postRouter = createTRPCRouter({
     return atachUserData(posts);
   }),
 
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.db.post.findUnique({
+        where: { id: Number(input.id) },
+      });
+
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return (await atachUserData([post]))[0];
+    }),
+
   create: privateProcedure
     .input(
       z.object({
@@ -92,12 +105,14 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .query(({ ctx, input }) =>
-      ctx.db.post.findMany({
-        where: {
-          authorId: input.userId,
-        },
-        take: 100,
-        orderBy: [{ createdAt: "desc" }],
-      }).then(atachUserData),
+      ctx.db.post
+        .findMany({
+          where: {
+            authorId: input.userId,
+          },
+          take: 100,
+          orderBy: [{ createdAt: "desc" }],
+        })
+        .then(atachUserData),
     ),
 });
