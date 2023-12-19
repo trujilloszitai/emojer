@@ -1,13 +1,10 @@
 import Head from "next/head";
 import Image from "next/image";
 import { api } from "~/utils/api";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { db } from "~/server/db";
-import { appRouter } from "~/server/api/root";
-import superjson from "superjson";
 import type { NextPage, GetStaticProps, GetStaticPaths } from "next";
 import { AppLayout } from "~/components/Layout";
 import { LoadingScreen, PostView } from "~/components";
+import { generateServerSideHelper } from "~/server/helpers/serverSideHelper";
 
 const Profile: NextPage<{ username: string }> = ({ username }) => {
   const { data } = api.profile.getUserByUsername.useQuery({
@@ -33,7 +30,7 @@ const Profile: NextPage<{ username: string }> = ({ username }) => {
             />
           </div>
           <div className="h-[64px]"></div>
-          <div className="p-4 text-2xl font-bold border-b border-slate-700">
+          <div className="border-b border-slate-700 p-4 text-2xl font-bold">
             {`@${data.username}`}
           </div>
           <div className="border-b border-slate-700">
@@ -52,11 +49,7 @@ export const getStaticPaths: GetStaticPaths = () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: { db, currentUserId: null },
-    transformer: superjson, // optional - adds superjson serialization
-  });
+  const helpers = generateServerSideHelper();
 
   const slug = context.params?.slug;
 
@@ -75,15 +68,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 const ProfileFeed = (props: { userId: string }) => {
-  const { data, isLoading } = api.post.getByUserId.useQuery({ userId: props.userId })
+  const { data, isLoading } = api.post.getByUserId.useQuery({
+    userId: props.userId,
+  });
 
   if (isLoading) return <LoadingScreen />;
 
   if (!data || data.length === 0) return <div>User has not posted!</div>;
 
-  return <div className="flex flex-col">
-    {data.map((fullPost) => (
-      <PostView {...fullPost} key={fullPost.post.id} />
-    ))}
-  </div>
-}
+  return (
+    <div className="flex flex-col">
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
